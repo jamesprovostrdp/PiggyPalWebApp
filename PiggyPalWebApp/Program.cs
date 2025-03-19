@@ -1,7 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using PiggyPalWebApp.Models.Database;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<DatabaseContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
 
 var app = builder.Build();
 
