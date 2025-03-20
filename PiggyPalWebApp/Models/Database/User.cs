@@ -23,6 +23,7 @@ namespace PiggyPalWebApp.Models.Database
         [Required(ErrorMessage = "Password is required.")]
         public string HashPassword { get; set; }
 
+        [Required]
         public Role Role { get; set; } = Role.User;
 
     }
