@@ -16,13 +16,14 @@ namespace PiggyPalWebApp.Models.Database
         [AllowNull]
         [DataType(DataType.Currency)]
         [Range(0, double.MaxValue, ErrorMessage = "Spending Limit must be a positive value.")]
-        public decimal? SpendingLimit { get; set; } = null;
+        public double? SpendingLimit { get; set; } = null;
 
         [Required]
         public bool IsExpense { get; set; } = true;
 
         [Required]
         public string BackgroundColor { get; set; } = Color.White.ToString();
+
 
         public int UserID { get; set; }
         public User? Owner { get; set; }
