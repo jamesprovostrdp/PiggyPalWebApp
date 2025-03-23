@@ -20,6 +20,18 @@ namespace PiggyPalWebApp.Controllers
             _tokenService = tokenService;
         }
 
+        [Route("/login")]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [Route("/register")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Register(UserRegisterDataModel userRegister)
         {
