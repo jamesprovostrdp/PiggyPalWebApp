@@ -24,7 +24,6 @@ namespace PiggyPalWebApp.Services
 
             if (threshold.CurrentSpending > threshold.LimitAmount)
             {
-                // Trigger notification (e.g., store in DB or send an alert)
                 Console.WriteLine($"Warning: You have exceeded your budget in category {categoryId}.");
                 return true;
             }
