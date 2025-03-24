@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PiggyPalWebApp.Models.Database
 {
@@ -10,6 +10,11 @@ namespace PiggyPalWebApp.Models.Database
         [Required]
         [DataType(DataType.Date, ErrorMessage = "Not a valid Date.")]
         public DateTime DateOfRecord { get; set; } = DateTime.Today;
+
+        [AllowNull]
+        [MaxLength(35)]
+        public string? Description { get; set; }
+
         [Required]
         [DataType(DataType.Currency)]
         [Range(0, double.MaxValue, ErrorMessage = "Amount must be a positive value.")]
