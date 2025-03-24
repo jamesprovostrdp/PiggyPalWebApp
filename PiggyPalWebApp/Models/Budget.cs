@@ -2,7 +2,7 @@
 
 namespace PiggyPalWebApp.Models
 {
-    public class BudgetThreshold
+    public class Budget
     {
         [Key]
         public int Id { get; set; }
@@ -11,11 +11,11 @@ namespace PiggyPalWebApp.Models
         public int UserId { get; set; }
 
         [Required]
-        public int CategoryId { get; set; }
+        public decimal Income { get; set; }  // Users monthly or weekly income
 
         [Required]
-        public decimal LimitAmount { get; set; }
+        public decimal ExpectedSavings { get; set; } // Desired savings amount
 
-        public decimal CurrentSpending { get; set; } = 0;
+        public decimal AvailableBudget => Income - ExpectedSavings;  // Remaining budget for expenses
     }
 }
