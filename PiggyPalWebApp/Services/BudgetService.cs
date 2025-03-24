@@ -15,22 +15,22 @@ namespace PiggyPalWebApp.Services
         // Get user's current budget data
         public async Task<Budget?> GetUserBudget(int userId)
         {
-            return await _context.Budgets.FirstOrDefaultAsync(b => b.UserId == userId);
+            return await _context.Budgets.FirstOrDefaultAsync(budget => budget.UserId == userId);
         }
 
         // Create or update the budget
         public async Task<bool> SetUserBudget(int userId, decimal income, decimal expectedSavings)
         {
-            var budget = await _context.Budgets.FirstOrDefaultAsync(b => b.UserId == userId);
-            if (budget == null)
+            var userBudget = await _context.Budgets.FirstOrDefaultAsync(budget => budget.UserId == userId);
+            if (userBudget == null)
             {
-                budget = new Budget { UserId = userId, Income = income, ExpectedSavings = expectedSavings };
-                _context.Budgets.Add(budget);
+                userBudget = new Budget { UserId = userId, Income = income, ExpectedSavings = expectedSavings };
+                _context.Budgets.Add(userBudget);
             }
             else
             {
-                budget.Income = income;
-                budget.ExpectedSavings = expectedSavings;
+                userBudget.Income = income;
+                userBudget.ExpectedSavings = expectedSavings;
             }
 
             await _context.SaveChangesAsync();
@@ -40,15 +40,15 @@ namespace PiggyPalWebApp.Services
         // Get the amount left to spend
         public async Task<decimal> GetRemainingBudget(int userId)
         {
-            var budget = await _context.Budgets.FirstOrDefaultAsync(b => b.UserId == userId);
-            if (budget == null) return 0;
+            var userBudget = await _context.Budgets.FirstOrDefaultAsync(budget => budget.UserId == userId);
+            if (userBudget == null) return 0;
 
             // Sums up all expenses for the user
             var totalExpenses = await _context.Transactions
-                .Where(t => t.UserId == userId && t.Type == "Expense")
-                .SumAsync(t => t.Amount);
+                .Where(transaction => transaction.UserId == userId && transaction.Type == "Expense")
+                .SumAsync(transaction => transaction.Amount);
 
-            return budget.AvailableBudget - totalExpenses;
+            return userBudget.AvailableBudget - totalExpenses;
         }
 
         // Check if a new expense exceeds the budget
