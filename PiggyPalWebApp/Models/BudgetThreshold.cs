@@ -2,6 +2,7 @@
 
 namespace PiggyPalWebApp.Models
 {
+    // BudgetThreshhold class that gets and sets user data for budgeting
     public class BudgetThreshold
     {
         [Key]
@@ -14,8 +15,8 @@ namespace PiggyPalWebApp.Models
         public int CategoryId { get; set; }
 
         [Required]
-        public decimal LimitAmount { get; set; }
+        public decimal LimitAmount { get; set; } // Sets the budgeting limit
 
-        public decimal CurrentSpending { get; set; } = 0;
+        public decimal CurrentSpending { get; set; } = 0; // Sets the users current weekly/monthly spending based on input criteria
     }
 }

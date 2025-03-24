@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations; // Uses DataAnnotations such as Key and Required
 
 namespace PiggyPalWebApp.Models
 {
@@ -18,6 +18,6 @@ namespace PiggyPalWebApp.Models
         [Required]
         public DateTime Deadline { get; set; }  // Deadline for the goal
 
-        public string Status { get; set; } = "In Progress";  // Default status when working on a goal
+        public string Status { get; set; } = "In Progress";  // Default status when working towards a goal
     }
 }
