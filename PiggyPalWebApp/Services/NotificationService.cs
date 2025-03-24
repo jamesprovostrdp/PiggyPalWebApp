@@ -12,24 +12,24 @@ namespace PiggyPalWebApp.Services
             _context = context;
         }
 
-        public async Task<bool> CheckOverspending(int userId, int categoryId, decimal newExpense)
-        {
-            var threshold = await _context.BudgetThresholds
-                .FirstOrDefaultAsync(b => b.UserId == userId && b.CategoryId == categoryId);
+        //public async Task<bool> CheckOverspending(int userId, int categoryId, decimal newExpense)
+        //{
+        //    var threshold = await _context.BudgetThresholds
+        //        .FirstOrDefaultAsync(b => b.UserId == userId && b.CategoryId == categoryId);
 
-            if (threshold == null) return false;
+        //    if (threshold == null) return false;
 
-            threshold.CurrentSpending += newExpense;
-            await _context.SaveChangesAsync();
+        //    threshold.CurrentSpending += newExpense;
+        //    await _context.SaveChangesAsync();
 
-            if (threshold.CurrentSpending > threshold.LimitAmount)
-            {
-                // Trigger notification (e.g., store in DB or send an alert)
-                Console.WriteLine($"Warning: You have exceeded your budget in category {categoryId}.");
-                return true;
-            }
+        //    if (threshold.CurrentSpending > threshold.LimitAmount)
+        //    {
+        //        // Trigger notification (e.g., store in DB or send an alert)
+        //        Console.WriteLine($"Warning: You have exceeded your budget in category {categoryId}.");
+        //        return true;
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
     }
 }
