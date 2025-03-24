@@ -33,6 +33,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddSingleton(new CSVFileService());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
