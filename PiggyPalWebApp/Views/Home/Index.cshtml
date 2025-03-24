@@ -1,8 +1,59 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "PiggyPal";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<nav class="navbar bg-primary" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">PiggyPal</a>
+        <a class="btn btn-light" asp-controller="Account" asp-action="Login" >Login</a>
+    </div>
+</nav>
+
+<h1>Welcome to PiggyPal</h1>
+<h2>A Pal for you wallet</h2>
+
+<div class="featuresList">
+    <ul class="bg-danger"></ul>
+    <ul>Live Chart Updates</ul>
+    <ul>Savings Goal Tracking</ul>
+    <ul>Budget Categories</ul>
+    </div>
+
+<div class="accordion mt-5" id="accordionFAQ">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" fdprocessedid="rl81o">
+                Do I have to pay?
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <strong>No.</strong> PiggyPal is a <code>free</code> web application.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" fdprocessedid="5olrhl">
+                Where does my data come from?
+            </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <strong>The data we use is imported from each user.</strong> Users can choose to manually input their data or <code> upload </code> their bank statements for an automatic experience.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" fdprocessedid="8ko0d">
+                Is there a mobile app?
+            </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <strong>No.</strong> We do not have an application to download from the App or Google Play Store. <code>However</code>, you can set it to your home screen.
+            </div>
+        </div>
+    </div>
 </div>
