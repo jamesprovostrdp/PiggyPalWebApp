@@ -1,0 +1,18 @@
+﻿@using PiggyPalWebApp.Models.Database
+@model CSVViewModel
+@{
+    ViewData["Title"] = "CSV File Parse";
+}
+
+<div id="content">
+    @foreach (Record record in Model.Records) {
+        <div>
+            @record.DateOfRecord 
+            <br />
+            @record.RecordAmount 
+            <br />
+            @record.Description
+        </div>
+        <br />
+    }
+</div>

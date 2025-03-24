@@ -13,10 +13,16 @@ namespace PiggyPalWebApp.Services
 
         }
 
-        public ICollection<Record>? ParseFileToDataTable(string filePath, string[] delimiters)
+        /// <summary>
+        /// Parses given file with set delimiters and returns a collection of Record objects.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="delimiters"></param>
+        /// <returns>Collection of Records or null if the file is empty.</returns>
+        public ICollection<Record>? ParseFileToRecords(string filePath, string[] delimiters)
         {
             // Declair Collection of Records to a null default
-            ICollection<Record>? Records = null;
+            ICollection<Record>? Records = [];
 
             // Create and set up the parser and its delimiters
             var parser = new TextFieldParser(filePath)
@@ -26,7 +32,7 @@ namespace PiggyPalWebApp.Services
             parser.SetDelimiters(delimiters);
 
             // Get first row (columns)
-            string[] dataFileColumns = parser.ReadFields();
+            string[]? dataFileColumns = parser.ReadFields();
             int[] parsedColumnIDs = [0, 0, 0];
 
             if (dataFileColumns != null)
@@ -40,7 +46,7 @@ namespace PiggyPalWebApp.Services
                     x++;
                 }
             }
-            else return Records;
+            else return null;
 
             // Go through file and find rows and create Record objects
             while (!parser.EndOfData)
