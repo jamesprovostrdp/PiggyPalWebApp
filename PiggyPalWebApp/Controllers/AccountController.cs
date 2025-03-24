@@ -21,20 +21,33 @@ namespace PiggyPalWebApp.Controllers
         }
 
         [Route("/login")]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
 
         [Route("/register")]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(UserRegisterDataModel userRegister)
+        public IActionResult Register(UserRegisterDataModel userRegister)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(userRegister);
+            }
+
+            if (userRegister.Password != userRegister.ConfirmPassword)
+            {
+                ModelState.AddModelError(string.Empty, "Passwords do not match.");
+                return View(userRegister);
+            }
+
             // Create a user object with use information
             User user = new()
             {
@@ -46,20 +59,20 @@ namespace PiggyPalWebApp.Controllers
 
             // Add user to database and save
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             // Return 200 and confrimation
             return Ok("User registered");
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(UserAuthDataModel userAuth)
+        public IActionResult Login(UserAuthDataModel userAuth)
         {
             // Get user based on inputed username
-            User? user = await _context.Users.SingleOrDefaultAsync(u => u.Username == userAuth.Username);
+            User? user = _context.Users.SingleOrDefault(u => u.Username == userAuth.Username);
 
             // If username isnt found compare to emails instead
-            user ??= await _context.Users.SingleOrDefaultAsync(u => u.Email == userAuth.Username);
+            user ??= _context.Users.SingleOrDefault(u => u.Email == userAuth.Username);
 
             // If credentials dont match or do not exist return 401
             if (user == null || !BCrypt.Net.BCrypt.Verify(userAuth.Password, user.HashPassword))
