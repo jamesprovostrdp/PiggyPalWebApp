@@ -4,10 +4,13 @@ using System.Drawing;
 
 namespace PiggyPalWebApp.Models.Database
 {
-    public class Category
+    public class Category // Category class
     {
-        [Key]
+        [Key] // CategoryId set as the primary key
         public int CategoryId { get; set; }
+
+        public int UserID { get; set; }
+        public User? Owner { get; set; } // Nullable value for category/goals Owner
 
         [Required]
         [Length(1, 25, ErrorMessage = "Name must be between 1 to 25 characters.")]
@@ -23,10 +26,6 @@ namespace PiggyPalWebApp.Models.Database
 
         [Required]
         public string BackgroundColor { get; set; } = Color.White.ToString();
-
-
-        public int UserID { get; set; }
-        public User? Owner { get; set; }
 
         public ICollection<Record>? Records { get; set; }
 
