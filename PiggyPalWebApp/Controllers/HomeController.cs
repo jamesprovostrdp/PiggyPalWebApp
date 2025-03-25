@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PiggyPalWebApp.Models;
 
@@ -18,14 +20,10 @@ public class HomeController : Controller
         return View();
     }
 
-
-    public IActionResult Login()
+    [Authorize]
+    public IActionResult Protected()
     {
-        return View(); 
-    }
-    public IActionResult Privacy()
-    {
-        return View();
+        return Ok("Authroized!");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

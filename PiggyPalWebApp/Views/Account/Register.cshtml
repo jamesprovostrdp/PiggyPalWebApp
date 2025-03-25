@@ -1,8 +1,8 @@
-﻿@model UserRegisterDataModel
+﻿@model UserDTO
 @{
 }
 
-<form asp-action="Register" method="post">
+<form action="/api/auth/register" method="post">
         <h2>Register</h2>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -25,9 +25,9 @@
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
         <div>
-            <label asp-for="ConfirmPassword" class="form-label mt-4">Confirm Password</label>
-            <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm Password" autocomplete="off">
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            <label asp-for="PasswordConfirmed" class="form-label mt-4">Confirm Password</label>
+            <input asp-for="PasswordConfirmed" type="password" class="form-control" placeholder="Confirm Password" autocomplete="off">
+            <span asp-validation-for="PasswordConfirmed" class="text-danger"></span>
         </div>
         <br />
         <button type="submit" class="btn btn-primary">Register</button>
