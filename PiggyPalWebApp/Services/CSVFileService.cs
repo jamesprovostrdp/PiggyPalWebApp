@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using Azure;
+using Microsoft.VisualBasic.FileIO;
 using PiggyPalWebApp.Models.Database;
 using System.Data;
 using System.Diagnostics.Metrics;
@@ -7,12 +8,6 @@ namespace PiggyPalWebApp.Services
 {
     public class CSVFileService
     {
-
-        public CSVFileService()
-        {
-
-        }
-
         /// <summary>
         /// Parses given file with set delimiters and returns a collection of Record objects.
         /// </summary>
@@ -27,7 +22,7 @@ namespace PiggyPalWebApp.Services
             // Create and set up the parser and its delimiters
             var parser = new TextFieldParser(filePath)
             {
-                TextFieldType = Microsoft.VisualBasic.FileIO.FieldType.Delimited
+                TextFieldType = FieldType.Delimited
             };
             parser.SetDelimiters(delimiters);
 
@@ -69,6 +64,26 @@ namespace PiggyPalWebApp.Services
 
             // Return collected Record Objects
             return Records;
+        }
+
+        public string[] ParseRecordsToStrings(List<Record> records)
+        {
+            string[] rows = new string[records.Count];
+
+            
+            foreach (var row in records)
+            {
+                var description = "";
+
+                if (row.Description is not null)
+                {
+                    description = row.Description;
+                
+                }
+                rows.Append(row.DateOfRecord.ToShortDateString() + "," + row.RecordAmount.ToString() + "," + description);
+            }
+
+            return rows;
         }
     }
 }
