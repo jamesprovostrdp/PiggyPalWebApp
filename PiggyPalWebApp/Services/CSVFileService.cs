@@ -21,7 +21,7 @@ namespace PiggyPalWebApp.Services
         /// <returns>Collection of Records or null if the file is empty.</returns>
         public ICollection<Record>? ParseFileToRecords(string filePath, string[] delimiters)
         {
-            // Declair Collection of Records to a null default
+            // Declare Collection of Records to a null default
             ICollection<Record>? Records = [];
 
             // Create and set up the parser and its delimiters
@@ -41,8 +41,8 @@ namespace PiggyPalWebApp.Services
                 foreach (var column in dataFileColumns)
                 {
                     if (column.Contains("Date")) parsedColumnIDs[0] = x;
-                    if (column.Contains("Description")) parsedColumnIDs[1] = x;
-                    if (column.Contains("Amount")) parsedColumnIDs[2] = x;
+                    if (column.Contains("Amount")) parsedColumnIDs[1] = x;
+                    if (column.Contains("Description")) parsedColumnIDs[2] = x;
                     x++;
                 }
             }
@@ -59,8 +59,9 @@ namespace PiggyPalWebApp.Services
                 {
                     Records.Add(new Record() { 
                         DateOfRecord = DateTime.Parse(row[parsedColumnIDs[0]]), 
-                        Description = row[parsedColumnIDs[1]], 
-                        RecordAmount = double.Parse(row[parsedColumnIDs[2]]) 
+                        RecordAmount = double.Parse(row[parsedColumnIDs[1]]),
+                        Description = row[parsedColumnIDs[2]]
+
                     });
                 }
 
