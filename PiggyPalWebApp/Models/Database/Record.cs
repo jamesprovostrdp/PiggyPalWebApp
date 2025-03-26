@@ -18,7 +18,7 @@ namespace PiggyPalWebApp.Models.Database
         [Required]
         [DataType(DataType.Currency)]
         [Range(0, double.MaxValue, ErrorMessage = "Amount must be a positive value.")]
-        public double Amount { get; set; }
+        public double RecordAmount { get; set; }
 
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
