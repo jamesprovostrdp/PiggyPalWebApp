@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using PiggyPalWebApp.Models;
 using PiggyPalWebApp.Models.Database;
 using PiggyPalWebApp.Services;
+using System.Collections.Generic;
+using System.Text;
 
 namespace PiggyPalWebApp.Controllers
 {
@@ -33,27 +35,23 @@ namespace PiggyPalWebApp.Controllers
         }
 
         [HttpGet]
-        [Route("csv/download/{id}")]
-        public async Task<ActionResult> DownloadFile(int id)
+        [Route("csv/download/{id}/{categoryName?}")]
+        public FileResult DownloadCSVFile(int id, string? categoryName)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
-
-            if (category is null || category.Records is null)
+            if (categoryName == null)
             {
-                return NotFound();
+                categoryName = "Category";
             }
+            // Collect all records that are in the given category
+            var records = _context.Records
+                .Where(r => r.CategoryId == id)
+                    .OrderByDescending(r => r.DateOfRecord)
+            .ToList();
 
-            Response.Clear();
-            Response.Headers.Append("Content-Disposition", $"attachment; filename={category.DisplayName}.csv");
-            Response.ContentType = "text/csv";
+            // Parse the Records into bytes
+            var bytes = _csvFileService.ParseRecordsToBytes(records);
 
-            // Write all my data
-            await Response.WriteAsync("Date,Amount,Description");
-            var rows = _csvFileService.ParseRecordsToStrings(category.Records.ToList());
-            await Response.CompleteAsync();
-
-            // Not sure what else to do here
-            return Ok();
+            return File(bytes, "text/csv", $"{categoryName}Record-{DateTime.UtcNow}.csv");
         }
 
     }

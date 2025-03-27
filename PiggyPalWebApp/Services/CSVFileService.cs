@@ -3,6 +3,7 @@ using Microsoft.VisualBasic.FileIO;
 using PiggyPalWebApp.Models.Database;
 using System.Data;
 using System.Diagnostics.Metrics;
+using System.Text;
 
 namespace PiggyPalWebApp.Services
 {
@@ -66,24 +67,36 @@ namespace PiggyPalWebApp.Services
             return Records;
         }
 
-        public string[] ParseRecordsToStrings(List<Record> records)
+        /// <summary>
+        /// Parses given records into a byte array for use in file creation.
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns>An Array of Bytes</returns>
+        public byte[] ParseRecordsToBytes(List<Record> records)
         {
-            string[] rows = new string[records.Count];
-
+            List<string> rows = [];
             
-            foreach (var row in records)
+            // Go through every record and format to a csv row
+            foreach (Record record in records)
             {
                 var description = "";
 
-                if (row.Description is not null)
+                // Descriptions are optional so handle nulls
+                if (record.Description is not null)
                 {
-                    description = row.Description;
+                    description = record.Description;
                 
                 }
-                rows.Append(row.DateOfRecord.ToShortDateString() + "," + row.RecordAmount.ToString() + "," + description);
+                rows.Add(record.DateOfRecord.ToShortDateString() + "," + record.RecordAmount.ToString() + "," + description);
             }
 
-            return rows;
+            // Converts the rows into a sigular string for later use in converting to bytes
+            string singularString = "Date,Amount,Description\n" + String.Join("\n", rows.ToArray());
+
+            // Convert the string to and array of bytes and return it
+            byte[] fileBytes = Encoding.UTF8.GetBytes(singularString);
+
+            return fileBytes;
         }
     }
 }
