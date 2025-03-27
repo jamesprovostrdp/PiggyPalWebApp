@@ -18,7 +18,7 @@ namespace PiggyPalWebApp.Services
             var category = _context.Categories
                                    .FirstOrDefault(category => category.CategoryId == categoryId);
 
-            return category?.Records?.Sum(record => record.Amount) ?? 0;
+            return category?.Records?.Sum(record => record.RecordAmount) ?? 0;
         }
 
         // Method to check if the user is over budget in a category
