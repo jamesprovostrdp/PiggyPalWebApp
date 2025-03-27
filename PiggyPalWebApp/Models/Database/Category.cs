@@ -27,7 +27,7 @@ namespace PiggyPalWebApp.Models.Database
         [Required]
         public string BackgroundColor { get; set; } = Color.White.ToString();
 
-        public ICollection<Record>? Records { get; set; }
+        public ICollection<Record> Records { get; set; }
 
     }
 }
