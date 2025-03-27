@@ -1,18 +1,14 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using Azure;
+using Microsoft.VisualBasic.FileIO;
 using PiggyPalWebApp.Models.Database;
 using System.Data;
 using System.Diagnostics.Metrics;
+using System.Text;
 
 namespace PiggyPalWebApp.Services
 {
     public class CSVFileService
     {
-
-        public CSVFileService()
-        {
-
-        }
-
         /// <summary>
         /// Parses given file with set delimiters and returns a collection of Record objects.
         /// </summary>
@@ -27,7 +23,7 @@ namespace PiggyPalWebApp.Services
             // Create and set up the parser and its delimiters
             var parser = new TextFieldParser(filePath)
             {
-                TextFieldType = Microsoft.VisualBasic.FileIO.FieldType.Delimited
+                TextFieldType = FieldType.Delimited
             };
             parser.SetDelimiters(delimiters);
 
@@ -69,6 +65,38 @@ namespace PiggyPalWebApp.Services
 
             // Return collected Record Objects
             return Records;
+        }
+
+        /// <summary>
+        /// Parses given records into a byte array for use in file creation.
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns>An Array of Bytes</returns>
+        public byte[] ParseRecordsToBytes(List<Record> records)
+        {
+            List<string> rows = [];
+            
+            // Go through every record and format to a csv row
+            foreach (Record record in records)
+            {
+                var description = "";
+
+                // Descriptions are optional so handle nulls
+                if (record.Description is not null)
+                {
+                    description = record.Description;
+                
+                }
+                rows.Add(record.DateOfRecord.ToShortDateString() + "," + record.RecordAmount.ToString() + "," + description);
+            }
+
+            // Converts the rows into a sigular string for later use in converting to bytes
+            string singularString = "Date,Amount,Description\n" + String.Join("\n", rows.ToArray());
+
+            // Convert the string to and array of bytes and return it
+            byte[] fileBytes = Encoding.UTF8.GetBytes(singularString);
+
+            return fileBytes;
         }
     }
 }
