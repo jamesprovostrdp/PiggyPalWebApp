@@ -1,30 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace PiggyPalWebApp.Models.Database
 {
-    public enum Role
+    public class User : IdentityUser
     {
-        User,
-        Admin
-    }
-
-    public class User
-    {
-        [Key]
-        public int UserId { get; set; }
-
-        [Required(ErrorMessage = "Username is required.")]
-        public string Username { get; set; }
-
-        [Required]
-        [EmailAddress(ErrorMessage = "Not valid Email Address.")]
-        public string Email { get; set; }
-
-        [Required(ErrorMessage = "Password is required.")]
-        public string HashPassword { get; set; }
-
-        [Required]
-        public Role Role { get; set; } = Role.User;
 
     }
 }
