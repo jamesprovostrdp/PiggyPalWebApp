@@ -1,13 +1,9 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using PiggyPalWebApp.Models.Database
+@{
     ViewData["Title"] = "PiggyPal";
 }
-
-<nav class="navbar bg-primary" data-bs-theme="dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">PiggyPal</a>
-        <a class="btn btn-light" asp-controller="Account" asp-action="Login" >Login</a>
-    </div>
-</nav>
+@inject SignInManager<User> SignInManager
 
 <h1>Welcome to PiggyPal</h1>
 <h2>A Pal for you wallet</h2>
