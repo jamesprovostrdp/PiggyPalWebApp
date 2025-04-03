@@ -1,0 +1,87 @@
+
+.sideBar{
+    position: absolute;
+    left: 0;
+    width:22%;
+    height: 100%;
+    scroll-behavior:smooth;
+    overflow: scroll;
+}
+
+.loginPartial {
+    display: none;
+}
+/*
+.savedProgress{
+    margin-top: 5px;
+}*/
+
+#mainNav {
+    position: absolute;
+    right:0;
+    width:75%;
+}
+
+.chatSection {
+    position: absolute;
+    right: 23%;
+    bottom: 0;
+
+}
+
+#Chart1{
+
+    width:1000px;
+    height:500px;
+}
+
+
+.goalCards {
+
+    position:absolute;
+    right:1%;
+    top: 100px;
+}
+
+#addGoalBtn{
+    position:absolute;
+    right: 150px;
+    color:black;
+}
+
+
+/*#sidebarAddBtn {
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 1;
+}*/
+
+#addNewCategoryBtn {
+    position: absolute;
+    right: 0.5rem;
+    top: 9.5rem;
+    z-index: 10;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#importContainer{
+    margin:0 auto;
+    text-align:center;
+}
+
+#budgetProgress {
+    position:absolute;
+    top:6rem;
+    left: 30rem;
+    width:50%;
+    justify-content:center;
+
+
+}
