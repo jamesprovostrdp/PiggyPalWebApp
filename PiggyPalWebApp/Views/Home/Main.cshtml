@@ -1,10 +1,8 @@
-﻿<nav class="navbar bg-primary" data-bs-theme="dark" id="mainNav">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">PiggyPal</a>
-        <button class="btn btn-success" id="addGoalBtn" data-bs-toggle="modal" data-bs-target="#addGoalModal">Add Saving Goal</button>
-        <a class="btn btn-light" asp-controller="Account" asp-action="Login">Logout</a>
-    </div>
-</nav>
+@{
+    ViewData["Title"] = "PiggyPal";
+}
+<h1 class="titleHeading">PiggyPal</h1>
+<button class="btn btn-success" id="addGoalBtn" data-bs-toggle="modal" data-bs-target="#addGoalModal">Add Saving Goal</button>
 
 
 <!--Savings goal cards-->
