@@ -14,41 +14,6 @@ namespace PiggyPalWebApp.Models.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Category>().HasData(
-                new Category
-                {
-                    CategoryId = 1,
-                    DisplayName = "Food",
-                    SpendingLimit = 10,
-                    UserID = 1,
-                }
-            );
-
-            modelBuilder.Entity<Record>().HasData(
-                new Record
-                {
-                    RecordId = 1,
-                    CategoryId = 1,
-                    RecordAmount = 2.50,
-                    DateOfRecord = DateTime.Today
-                },
-                new Record
-                {
-                    RecordId = 2,
-                    CategoryId = 1,
-                    RecordAmount = 5.50,
-                    DateOfRecord = DateTime.Today
-                },
-                new Record
-                {
-                    RecordId = 3,
-                    CategoryId = 1,
-                    RecordAmount = 8.50,
-                    DateOfRecord = DateTime.Today
-                }
-            );
-
         }
     }
 }
