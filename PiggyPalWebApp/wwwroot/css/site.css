@@ -24,7 +24,8 @@
 
 .chatSection {
     position: absolute;
-    right: 23%;
+    justify-content:center;
+    align-content:center;
     bottom: 0;
 
 }
@@ -45,8 +46,11 @@
 
 #addGoalBtn{
     position:absolute;
-    right: 150px;
+    right: 300px;
     color:black;
+    top:0px;
+    z-index:20;
+    border: solid
 }
 
 
