@@ -26,9 +26,16 @@ public class HomeController : Controller
         return Ok("Authroized!");
     }
 
-    public IActionResult Main()
+    [HttpGet]
+    [Route("/main")]
+    public IActionResult Main(MainViewModel viewModel)
     {
-        return View();
+        if (viewModel == null)
+        {
+            viewModel = new MainViewModel();
+        }
+
+        return View(viewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
