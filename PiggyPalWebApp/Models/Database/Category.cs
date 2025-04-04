@@ -9,8 +9,8 @@ namespace PiggyPalWebApp.Models.Database
         [Key] // CategoryId set as the primary key
         public int CategoryId { get; set; }
 
-        public int UserID { get; set; }
-        public User? Owner { get; set; } // Nullable value for category/goals Owner
+        public string OwnerId { get; set; }
+        public User Owner { get; set; } 
 
         [Required]
         [Length(1, 25, ErrorMessage = "Name must be between 1 to 25 characters.")]
