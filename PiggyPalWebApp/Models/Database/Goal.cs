@@ -8,7 +8,7 @@ namespace PiggyPalWebApp.Models.Database
         public int GoalId { get; set; }
 
         public int UserId { get; set; }
-        public User Owner { get; set; }
+        public User? Owner { get; set; }
 
         [Required]
         [StringLength(25, MinimumLength = 1, ErrorMessage = "Name must be between 1 to 25 characters.")] // Name of the goal contains a character limit of 25
