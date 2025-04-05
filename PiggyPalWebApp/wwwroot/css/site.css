@@ -24,13 +24,14 @@
 
 .chatSection {
     position: absolute;
-    bottom: 0;
-    left: 50%;
+    justify-content:center;
+    top:30%;
+    left: 70%;
     transform: translateX(-50%);
-    width: 100%;
-    max-width: 1200px; /* optional: restrict width */
+    width: 200%;
+    max-width: 1200px; 
     z-index: 1000;
-    background-color: white; /* optional */
+    background-color: white;
     padding: 1rem;
 }
 
