@@ -1,13 +1,12 @@
+@using PiggyPalWebApp.Models.Database
+@model MainViewModel
 @{
-    ViewData["Title"] = "PiggyPal";
+    ViewData["Title"] = "Dashboard - PiggyPal";
 }
-<h1 class="titleHeading">PiggyPal</h1>
-<button class="btn btn-success" id="addGoalBtn" data-bs-toggle="modal" data-bs-target="#addGoalModal">Add Saving Goal</button>
-
 
 <!--Savings goal cards-->
 <div class="goalCards d-flex gap-1 flex-column mt-3">
-
+    <button class="btn btn-success" id="addGoalBtn" data-bs-toggle="modal" data-bs-target="#addGoalModal">Add Saving Goal</button>
 
     <div class="card border-primary mb-3 d-none" style="width: 18rem;">
         <div class="card-header">Header</div>
@@ -64,12 +63,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                        <input type="text" id="goalTitleInput" class="form-control mb-2" placeholder="Goal Title" />
-                        <input type="number" id="goalAmountInput" class="form-control mb-2" placeholder="Target Amount" />
-                        <input type="date" id="goalDateInput" class="form-control mb-2" />
+                <input type="text" id="goalTitleInput" class="form-control mb-2" placeholder="Goal Title" />
+                <input type="number" id="goalAmountInput" class="form-control mb-2" placeholder="Target Amount" />
+                <input type="date" id="goalDateInput" class="form-control mb-2" />
             </div>
             <div class="modal-footer">
-                        <button class="btn btn-primary" id="saveGoalBtn" data-bs-dismiss="modal">Save Goal</button>
+                <button class="btn btn-primary" id="saveGoalBtn" data-bs-dismiss="modal">Save Goal</button>
             </div>
         </div>
     </div>
@@ -78,18 +77,23 @@
 
 
 
-<!--
-<div class="chatSection">
+<!--Chart area-->
+<div class="container-fluid chatSection">
+    <div class="row">
+        <div class="col-12 col-md-3 mb-3">
+            <input type="date" class="form-control" id="inputDefault" />
+        </div>
 
-    <input type="date" class="form-control" id="inputDefault" fdprocessedid="cv9pt"/>
-    <div class="charts">
-            <canvas id="Chart1"></canvas>
-          
+        <div class="col-12 col-md-9" id="chart">
+            <div class="charts">
+                <canvas id="Chart1"></canvas>
+            </div>
+        </div>
     </div>
-
 </div>
+<!--Chart area-->
 
--->
+
 
 
 <!--Income category modal-->
@@ -99,14 +103,24 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Income Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close"  data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <input type="text" id="incomeTitleInput" class="form-control mb-2" placeholder="Category Name" />
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="saveIncomeBtn" data-bs-dismiss="modal">Save Category</button>
-            </div>
+            <form asp-controller="Category" asp-action="CreateIncomeCategory" method="POST" class="modal-body">
+                <input asp-for="CategoryId" type="hidden" />
+
+                <input asp-for="CategoryIsExpense" value="false" type="hidden" />
+
+                <div class="input-group">
+                    <input asp-for="CategoryDisplayName" type="text" id="incomeTitleInput" class="form-control mb-2" placeholder="Category Name" />
+                </div>
+                <div class="input-group">
+                    <input asp-for="CategorySpendingLimit" type="number" id="incomeLimitInput" class="form-control mb-2" placeholder="Spending limit" />
+                </div>
+                <div class="input-group">
+                    <button class="btn btn-primary" id="saveIncomeBtn" type="submit" data-bs-dismiss="modal">Save Category</button>
+                </div>
+            </form>
+
         </div>
     </div>
 </div>
@@ -147,34 +161,44 @@
             <a class="nav-link" data-bs-toggle="tab" href="#sidebarHistory" aria-selected="false" role="tab" tabindex="-1">History</a>
         </li>
         <li id="importContainer">
-            <label for="formFile" class="form-label mt-4" >Import CSV</label>
-            <input class="form-control" type="file" id="formFile">
+            <form enctype="multipart/form-data" asp-controller="File" asp-action="ReadFileAndWriteRecords" method="post" runat="server">
+                <label for="formFile" class="form-label mt-4">Import CSV</label>
+                <input class="form-control" asp-for="FormFile" type="file" id="formFile">
+                <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
+            </form>
         </li>
         <li>
             <button type="button" id="addNewCategoryBtn" class="btn btn-primary">+</button>
         </li>
     </ul>
 
+
     <div id="myTabContent" class="tab-content">
-        
+
+
         <div class="tab-pane fade show active sidebar-section" id="sidebarIncome" role="tabpanel">
             <h5 class="mt-3 ml-3">Income</h5>
+            @foreach (Category category in Model.Categories)
+            {
+                if (category.IsExpense == false)
+                {
+                    <div class="card bg-secondary mb-3 incomeCard" style="max-width: 20rem;">
+                        <div class="card-header card-title">@category.DisplayName</div>
+                        <div class="card-body">
+                            <label>Date:</label>
+                            <input type="date" class="form-control mb-2 incomeDateInput" required />
 
-            <div class="card bg-secondary mb-3 incomeCard d-none" style="max-width: 20rem;">
-                <div class="card-header card-title">Income Title</div>
-                <div class="card-body">
-                    <label>Date:</label>
-                    <input type="date" class="form-control mb-2 incomeDateInput" required/>
+                            <label>Amount:</label>
+                            <input type="number" class="form-control mb-2 incomeAmountInput" placeholder="0.00" required />
 
-                    <label>Amount:</label>
-                    <input type="number" class="form-control mb-2 incomeAmountInput" placeholder="0.00" required />
-
-                    <div class="d-flex justify-content-center gap-2">
-                        <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm deleteCategory">Delete</button>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm deleteCategory">Delete</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                }
+            }
         </div>
 
 
@@ -216,48 +240,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">Date</th>
-                        <td>Category</td>
-                        <td>Amount</td>
-                        <td><button class="badge bg-primary">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Date</th>
-                        <td>Category</td>
-                        <td>Amount</td>
-                        <td><button class="badge bg-primary">Delete</button></td>
-                    </tr>
+                    @foreach (Record record in Model.Records)
+                    {
+                        <tr>
+                            <th scope="row">
+                                @record.DateOfRecord.ToShortDateString()
+                            </th>
+                            <td>
+                                @if (record.Description is null && record.Category is not null)
+                                {
+                                    @record.Category.DisplayName
+                                }
+                                else
+                                {
+                                    @record.Description
+                                }
+                            </td>
+                            <td>
+                                @record.RecordAmount
+                                </td>
+                            <td><button class="badge bg-primary">Delete</button></td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<ul class="list-group" id="budgetProgress">
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        Cras justo odio
-        <span class="badge bg-primary rounded-pill">14</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        Dapibus ac facilisis in
-        <span class="badge bg-primary rounded-pill">2</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        Morbi leo risus
-        <span class="badge bg-primary rounded-pill">1</span>
-    </li>
-</ul>
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!--
-    @{
-        ViewData["Title"] = "Main";
-    }
-    -->
 
 <script>
 
@@ -293,116 +307,116 @@
 
   
 
-        document.getElementById("saveGoalBtn").addEventListener("click", function () {
-        console.log("Save button clicked");
-      const title = document.getElementById("goalTitleInput").value.trim();
-        const amount = parseFloat(document.getElementById("goalAmountInput").value);
-        const dateStr = document.getElementById("goalDateInput").value;
+    //     document.getElementById("saveGoalBtn").addEventListener("click", function () {
+    //     console.log("Save button clicked");
+    //   const title = document.getElementById("goalTitleInput").value.trim();
+    //     const amount = parseFloat(document.getElementById("goalAmountInput").value);
+    //     const dateStr = document.getElementById("goalDateInput").value;
 
-        if (!title || isNaN(amount) || !dateStr) {
-            alert("Please fill in all fields.");
-        return;
-      }
+    //     if (!title || isNaN(amount) || !dateStr) {
+    //         alert("Please fill in all fields.");
+    //     return;
+    //   }
 
-        const goalDate = new Date(dateStr);
-        const today = new Date();
-        const diffMonths = Math.max(1, (goalDate.getFullYear() - today.getFullYear()) * 12 + goalDate.getMonth() - today.getMonth());
-        const monthlyPayment = (amount / diffMonths).toFixed(2);
+    //     const goalDate = new Date(dateStr);
+    //     const today = new Date();
+    //     const diffMonths = Math.max(1, (goalDate.getFullYear() - today.getFullYear()) * 12 + goalDate.getMonth() - today.getMonth());
+    //     const monthlyPayment = (amount / diffMonths).toFixed(2);
 
-        // Find the first hidden card
-        const cards = document.querySelectorAll(".goalCards .card");
-        console.log("Cards found:", cards);
-        let filled = false;
+    //     Find the first hidden card
+    //     const cards = document.querySelectorAll(".goalCards .card");
+    //     console.log("Cards found:", cards);
+    //     let filled = false;
 
-        for (const card of cards) {
-        if (card.classList.contains("d-none")) {
-            card.classList.remove("d-none");
+    //     for (const card of cards) {
+    //     if (card.classList.contains("d-none")) {
+    //         card.classList.remove("d-none");
 
-        card.querySelector(".card-header").textContent = title;
-        card.querySelector(".goalAmount").textContent = amount.toFixed(2);
-        card.querySelector(".goalDate").textContent = dateStr;
-        card.querySelector(".monthlyPayment").textContent = monthlyPayment;
-        card.querySelector(".remainingAmount").textContent = amount.toFixed(2);
+    //     card.querySelector(".card-header").textContent = title;
+    //     card.querySelector(".goalAmount").textContent = amount.toFixed(2);
+    //     card.querySelector(".goalDate").textContent = dateStr;
+    //     card.querySelector(".monthlyPayment").textContent = monthlyPayment;
+    //     card.querySelector(".remainingAmount").textContent = amount.toFixed(2);
 
-        // Reset progress bar
-        const progressBar = card.querySelector(".progress-bar");
-        progressBar.style.width = "0%";
-        progressBar.textContent = "0%";
+    //     Reset progress bar
+    //     const progressBar = card.querySelector(".progress-bar");
+    //     progressBar.style.width = "0%";
+    //     progressBar.textContent = "0%";
 
-        filled = true;
-        break;
-        }
-      }
+    //     filled = true;
+    //     break;
+    //     }
+    //   }
 
-        if (!filled) {
-            alert("You can only have 2 goals at a time.");
-      }
+    //     if (!filled) {
+    //         alert("You can only have 2 goals at a time.");
+    //   }
 
-        // Clear modal inputs
-        document.getElementById("goalTitleInput").value = "";
-        document.getElementById("goalAmountInput").value = "";
-        document.getElementById("goalDateInput").value = "";
-    });
+    //     Clear modal inputs
+    //     document.getElementById("goalTitleInput").value = "";
+    //     document.getElementById("goalAmountInput").value = "";
+    //     document.getElementById("goalDateInput").value = "";
+    // });
 
 
  
-    document.querySelectorAll(".deleteGoal").forEach(button => {
-                button.addEventListener("click", function () {
-                    const card = this.closest(".card");
-                    if (confirm("Delete this goal?")) {
-                        card.classList.add("d-none");
+    // document.querySelectorAll(".deleteGoal").forEach(button => {
+    //             button.addEventListener("click", function () {
+    //                 const card = this.closest(".card");
+    //                 if (confirm("Delete this goal?")) {
+    //                     card.classList.add("d-none");
 
-                        // Reset fields
-                        card.querySelector(".card-header").textContent = "Header";
-                        card.querySelector(".goalAmount").textContent = "0.00";
-                        card.querySelector(".goalDate").textContent = "dd-mm-yyyy";
-                        card.querySelector(".monthlyPayment").textContent = "0.00";
-                        card.querySelector(".remainingAmount").textContent = "0.00";
+    //                     Reset fields
+    //                     card.querySelector(".card-header").textContent = "Header";
+    //                     card.querySelector(".goalAmount").textContent = "0.00";
+    //                     card.querySelector(".goalDate").textContent = "dd-mm-yyyy";
+    //                     card.querySelector(".monthlyPayment").textContent = "0.00";
+    //                     card.querySelector(".remainingAmount").textContent = "0.00";
 
-                        card.querySelector(".progress-bar").style.width = "0%";
-                        card.querySelector(".progress-bar").textContent = "0%";
-                    }
-                });
-    });
+    //                     card.querySelector(".progress-bar").style.width = "0%";
+    //                     card.querySelector(".progress-bar").textContent = "0%";
+    //                 }
+    //             });
+    // });
 
     // Delegate submit button clicks inside goal cards
-    document.querySelectorAll(".goalCards .card").forEach(card => {
-        const submitBtn = card.querySelector("button[type='submit']");
+    // document.querySelectorAll(".goalCards .card").forEach(card => {
+    //     const submitBtn = card.querySelector("button[type='submit']");
 
-        submitBtn.addEventListener("click", function () {
-            const depositInput = card.querySelector("input[type='number']");
-            const depositAmount = parseFloat(depositInput.value);
-            const goalAmount = parseFloat(card.querySelector(".goalAmount").textContent);
-            const remainingSpan = card.querySelector(".remainingAmount");
-            const progressBar = card.querySelector(".progress-bar");
+    //     submitBtn.addEventListener("click", function () {
+    //         const depositInput = card.querySelector("input[type='number']");
+    //         const depositAmount = parseFloat(depositInput.value);
+    //         const goalAmount = parseFloat(card.querySelector(".goalAmount").textContent);
+    //         const remainingSpan = card.querySelector(".remainingAmount");
+    //         const progressBar = card.querySelector(".progress-bar");
 
-            if (isNaN(depositAmount) || depositAmount <= 0) {
-                alert("Please enter a valid deposit amount.");
-                return;
-            }
+    //         if (isNaN(depositAmount) || depositAmount <= 0) {
+    //             alert("Please enter a valid deposit amount.");
+    //             return;
+    //         }
 
-            let currentRemaining = parseFloat(remainingSpan.textContent);
-            let newRemaining = currentRemaining - depositAmount;
+    //         let currentRemaining = parseFloat(remainingSpan.textContent);
+    //         let newRemaining = currentRemaining - depositAmount;
 
-            if (newRemaining < 0) newRemaining = 0;
+    //         if (newRemaining < 0) newRemaining = 0;
 
-            const progress = 100 - (newRemaining / goalAmount) * 100;
+    //         const progress = 100 - (newRemaining / goalAmount) * 100;
 
-            // Update the remaining and progress bar
-            remainingSpan.textContent = newRemaining.toFixed(2);
-            progressBar.style.width = `${progress}%`;
-            progressBar.textContent = `${Math.round(progress)}%`;
+    //         Update the remaining and progress bar
+    //         remainingSpan.textContent = newRemaining.toFixed(2);
+    //         progressBar.style.width = `${progress}%`;
+    //         progressBar.textContent = `${Math.round(progress)}%`;
 
-            // Clear the input after submission
-            depositInput.value = "";
-        });
-    });
+    //         Clear the input after submission
+    //         depositInput.value = "";
+    //     });
+    // });
 
 
  
     // Below is for side bar
 
-
+        // Opens Modal for Category
         document.addEventListener("DOMContentLoaded", () => {
             const addBtn = document.getElementById("addNewCategoryBtn");
 
@@ -425,45 +439,45 @@
 
 
 
-        document.getElementById("saveIncomeBtn").addEventListener("click", () => {
-            const title = document.getElementById("incomeTitleInput").value.trim();
-            const container = document.getElementById("sidebarIncome");
-            const template = container.querySelector(".incomeCard.d-none");
+    //     document.getElementById("saveIncomeBtn").addEventListener("click", () => {
+    //         const title = document.getElementById("incomeTitleInput").value.trim();
+    //         const container = document.getElementById("sidebarIncome");
+    //         const template = container.querySelector(".incomeCard.d-none");
 
-            if (!title || !template) return;
+    //         if (!title || !template) return;
 
-            const clone = template.cloneNode(true);
-            clone.classList.remove("d-none");
-            clone.querySelector(".card-title").textContent = title;
+    //         const clone = template.cloneNode(true);
+    //         clone.classList.remove("d-none");
+    //         clone.querySelector(".card-title").textContent = title;
 
-            container.appendChild(clone);
+    //         container.appendChild(clone);
 
-            // Only clear what actually exists
-            document.getElementById("incomeTitleInput").value = "";
-        });
+    //         Only clear what actually exists
+    //         document.getElementById("incomeTitleInput").value = "";
+    //     });
 
 
-            document.querySelectorAll(".incomeCard .btn-outline-success").forEach(button => {
-                button.addEventListener("click", function () {
-                    const card = this.closest(".card");
-                    const dateInput = card.querySelector(".incomeDateInput");
-                    const amountInput = card.querySelector(".incomeAmountInput");
+    //         document.querySelectorAll(".incomeCard .btn-outline-success").forEach(button => {
+    //             button.addEventListener("click", function () {
+    //                 const card = this.closest(".card");
+    //                 const dateInput = card.querySelector(".incomeDateInput");
+    //                 const amountInput = card.querySelector(".incomeAmountInput");
 
-                    const date = dateInput.value;
-                    const amount = parseFloat(amountInput.value);
+    //                 const date = dateInput.value;
+    //                 const amount = parseFloat(amountInput.value);
 
-                    if (!date || isNaN(amount) || amount <= 0) {
-                        alert("Please enter a valid date and amount.");
-                        return;
-                    }
+    //                 if (!date || isNaN(amount) || amount <= 0) {
+    //                     alert("Please enter a valid date and amount.");
+    //                     return;
+    //                 }
 
-                    // Replace inputs with display
-                    dateInput.replaceWith(`Date: <span>${date}</span><br>`);
-                    amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
+    //                 Replace inputs with display
+    //                 dateInput.replaceWith(`Date: <span>${date}</span><br>`);
+    //                 amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
 
-                    this.remove(); // remove submit button
-                });
-            });
+    //                 this.remove(); remove submit button
+    //             });
+    //         });
 
     // document.getElementById("saveExpenseBtn").addEventListener("click", () => {
     //     const title = document.getElementById("goalTitleInput").value.trim();
@@ -508,45 +522,45 @@
     //         });
 
 
-    document.getElementById("saveExpenseBtn").addEventListener("click", () => {
-        const title = document.getElementById("expensesTitleInput").value.trim();
-        const container = document.getElementById("sidebarExpenses");
-        const template = container.querySelector(".expenseCard.d-none");
+    // document.getElementById("saveExpenseBtn").addEventListener("click", () => {
+    //     const title = document.getElementById("expensesTitleInput").value.trim();
+    //     const container = document.getElementById("sidebarExpenses");
+    //     const template = container.querySelector(".expenseCard.d-none");
 
-        if (!title || !template) return;
+    //     if (!title || !template) return;
 
-        const clone = template.cloneNode(true);
-        clone.classList.remove("d-none");
-        clone.querySelector(".card-title").textContent = title;
+    //     const clone = template.cloneNode(true);
+    //     clone.classList.remove("d-none");
+    //     clone.querySelector(".card-title").textContent = title;
 
-        container.appendChild(clone);
+    //     container.appendChild(clone);
 
-        // Only clear what actually exists
-        document.getElementById("expensesTitleInput").value = "";
-    });
+    //     Only clear what actually exists
+    //     document.getElementById("expensesTitleInput").value = "";
+    // });
 
 
-    document.querySelectorAll(".expenseCard .btn-outline-success").forEach(button => {
-        button.addEventListener("click", function () {
-            const card = this.closest(".card");
-            const dateInput = card.querySelector(".expenseDateInput");
-            const amountInput = card.querySelector(".expenseAmountInput");
+    // document.querySelectorAll(".expenseCard .btn-outline-success").forEach(button => {
+    //     button.addEventListener("click", function () {
+    //         const card = this.closest(".card");
+    //         const dateInput = card.querySelector(".expenseDateInput");
+    //         const amountInput = card.querySelector(".expenseAmountInput");
 
-            const date = dateInput.value;
-            const amount = parseFloat(amountInput.value);
+    //         const date = dateInput.value;
+    //         const amount = parseFloat(amountInput.value);
 
-            if (!date || isNaN(amount) || amount <= 0) {
-                alert("Please enter a valid date and amount.");
-                return;
-            }
+    //         if (!date || isNaN(amount) || amount <= 0) {
+    //             alert("Please enter a valid date and amount.");
+    //             return;
+    //         }
 
-            // Replace inputs with display
-            dateInput.replaceWith(`Date: <span>${date}</span><br>`);
-            amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
+    //         Replace inputs with display
+    //         dateInput.replaceWith(`Date: <span>${date}</span><br>`);
+    //         amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
 
-            this.remove(); // remove submit button
-        });
-    });
+    //         this.remove(); remove submit button
+    //     });
+    // });
 
 
 

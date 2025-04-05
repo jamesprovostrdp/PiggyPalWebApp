@@ -7,9 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Main\**" />
-    <Content Remove="Views\Main\**" />
-    <EmbeddedResource Remove="Views\Main\**" />
     <None Remove="Views\Main\**" />
   </ItemGroup>
 
