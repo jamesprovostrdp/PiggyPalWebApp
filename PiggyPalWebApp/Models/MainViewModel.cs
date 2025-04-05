@@ -11,6 +11,7 @@ namespace PiggyPalWebApp.Models
         public List<Goal> Goals { get; set; } = [];
         public List<Category> Categories { get; set; } = [ new Category(), new Category() ];
         public ChartModel Chart { get; set; } = new();
+        public IFormFile FormFile { get; set; }
 
         // FOR CATEGORY
         public int CategoryId { get; set; }

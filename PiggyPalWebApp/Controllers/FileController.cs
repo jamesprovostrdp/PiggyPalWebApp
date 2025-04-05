@@ -6,6 +6,7 @@ using PiggyPalWebApp.Models.Database;
 using PiggyPalWebApp.Services;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PiggyPalWebApp.Controllers
 {
@@ -32,6 +33,27 @@ namespace PiggyPalWebApp.Controllers
             }
 
             return View(new CSVViewModel() { Records = records });
+        }
+
+        [HttpPost]
+        [Route("csv/read/{file?}")]
+        public async Task<ActionResult> ReadFileAndWriteRecords(MainViewModel viewModel)
+        {
+            var records = _csvFileService.ParseFileToRecords(viewModel.FormFile, [","]).ToList();
+
+            if (records is null || records.Count == 0)
+            {
+                return NotFound();
+            }
+
+            foreach (Record record in records)
+            {
+                record.CategoryId = 3;
+                await _context.Records.AddAsync(record);
+            }
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Main", "Home");
         }
 
         [HttpGet]
