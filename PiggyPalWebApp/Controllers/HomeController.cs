@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using PiggyPalWebApp.Models;
 using PiggyPalWebApp.Models.Database;
+using System.Text.Json;
+
 
 namespace PiggyPalWebApp.Controllers;
 
@@ -70,6 +73,112 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateIncomeCategory(MainViewModel viewModel)
+    {
+        User? user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        Category newCategory = new()
+        {
+            DisplayName = viewModel.CategoryDisplayName,
+            OwnerId = user.Id,
+            SpendingLimit = viewModel.CategorySpendingLimit,
+            IsExpense = viewModel.CategoryIsExpense
+        };
+
+        await _context.Categories.AddAsync(newCategory);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Main", "Home");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateExpenseCategory(MainViewModel viewModel)
+    {
+        User? user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        Category newCategory = new()
+        {
+            DisplayName = viewModel.CategoryDisplayName,
+            OwnerId = user.Id,
+            SpendingLimit = viewModel.CategorySpendingLimit,
+            IsExpense = viewModel.CategoryIsExpense
+        };
+
+        await _context.Categories.AddAsync(newCategory);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Main", "Home");
+    }
+
+
+    public class RecordInput
+    {
+        public int CategoryId { get; set; }
+        public DateTime Date { get; set; }
+        public double Amount { get; set; }
+        public int SpendingLimit { get; set; }
+    }
+
+
+    [HttpPost]
+    public async Task<IActionResult> AddRecord(MainViewModel viewModel)
+    {
+        User? user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        Record newRecord = new()
+        {
+            DateOfRecord = viewModel.DateOfRecord,
+            RecordAmount = viewModel.RecordAmount,
+            CategoryId = viewModel.CategoryId,
+
+        };
+
+        _context.Records.Add(newRecord);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Main", "Home");
+
+
+    }
+
+    [HttpGet]
+    [Route("/chart-data")]
+    public async Task<IActionResult> GetChartData()
+    {
+        User? user = await _userManager.GetUserAsync(User);
+        if (user is null)
+            return Unauthorized();
+
+        var data = _context.Records
+            .Where(r => r.Category.OwnerId == user.Id)
+            .Select(r => new
+            {
+                date = r.DateOfRecord.ToString("yyyy-MM-dd"),
+                amount = r.RecordAmount,
+                category = r.Category.DisplayName
+
+
+            })
+            .ToList();
+
+        return Json(data);
+    }
+
+
 
 
 }
