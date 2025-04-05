@@ -1,115 +1,100 @@
-﻿//using Microsoft.AspNetCore.Mvc;
-//using PiggyPalWebApp.Models.Database;
-//using PiggyPalWebApp.Models.ViewModels;
-//using PiggyPalWebApp.Services;
 
-//namespace PiggyPalWebApp.Controllers
-//{
-//    public class GoalsController : Controller
-//    {
-//        private readonly GoalService _goalService;
+﻿using Microsoft.AspNetCore.Mvc;
+using PiggyPalWebApp.Models.Database;
+using PiggyPalWebApp.Models.ViewModels;
+using PiggyPalWebApp.Services;
 
-//        public GoalsController(GoalService goalService)
-//        {
-//            _goalService = goalService;
-//        }
+namespace PiggyPalWebApp.Controllers
+{
+    public class GoalsController : Controller
+    {
+        private readonly GoalService _goalService;
 
-//        public IActionResult Index()
-//        {
-//            var viewModel = new GoalViewModel
-//            {
-//                Goals = _goalService.GetAllGoals()
-//            };
-//            return View("~/Views/Home/Goals.cshtml", viewModel);
-//        }
+        // Constructor to initialize the GoalService
+        public GoalsController(GoalService goalService)
+        {
+            _goalService = goalService;
+        }
 
-//        [HttpPost]
-//        public IActionResult Add(GoalViewModel viewModel)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                _goalService.AddGoal(viewModel.NewGoal);
-//                return RedirectToAction("Index");
-//            }
+        // GET for displaying the list of goals
+        public IActionResult Index()
+        {
+            var viewModel = new GoalViewModel
+            {
+                // Retrieves all goals and calculate their monthly required savings
+                Goals = _goalService.GetAllGoals().Select(goal =>
+                {
+                    goal.CalculateMonthlySavings();
+                    return goal;
+                }).ToList()
+            };
 
-//            viewModel.Goals = _goalService.GetAllGoals();
-//            return View("~/Views/Home/Goals.cshtml", viewModel);
-//        }
+            // Returns the view with the populated viewModel
+            return View("~/Views/Home/Goals.cshtml", viewModel);
+        }
 
-//        [HttpPost]
-//        public IActionResult Delete(int id)
-//        {
-//            _goalService.DeleteGoal(id);
-//            return RedirectToAction("Index");
-//        }
-//    }
-//}
+        // POST for adding a new goal
+        [HttpPost]
+        public IActionResult Add(GoalViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                // Calls the GoalService to add a new goal
+                _goalService.AddGoal(viewModel.NewGoal);
+                return RedirectToAction("Index");
+            }
 
-////using Microsoft.AspNetCore.Authorization;
-////using Microsoft.AspNetCore.Mvc;
-////using Microsoft.EntityFrameworkCore;
-////using PiggyPalWebApp.Models.Database;
-////using System;
+            // Grabs all the goals and returns to the view with an error message if invalid
+            viewModel.Goals = _goalService.GetAllGoals();
+            return View("~/Views/Home/Goals.cshtml", viewModel);
+        }
 
-////namespace PiggyPalWebApp.Controllers
-////{
-////    [Route("api/goals")]
-////    [ApiController]
-////    [Authorize] // Requires authentication
-////    public class GoalsController : ControllerBase
-////    {
-////        private readonly DatabaseContext _context;
+        // POST for adding more savings to an existing goal
+        [HttpPost]
+        public IActionResult AddSavings(int id, double additionalAmount)
+        {
+            // Used to retrieve the goal based on the provided ID
+            var goal = _goalService.GetAllGoals().FirstOrDefault(g => g.GoalId == id);
 
-////        public GoalsController(DatabaseContext context)
-////        {
-////            _context = context;
-////        }
+            // Checks for null goal or the additional savings amount is invalid
+            if (goal == null || additionalAmount <= 0)
+            {
+                // Set the error message in TempData and redirect back to the goals list
+                TempData["Error"] = "Invalid goal or amount.";
+                return RedirectToAction("Index");
+            }
 
-////        // GET: api/goals/user/{userId} - Fetch all goals for a user
-////        [HttpGet("user/{userId}")]
-////        public async Task<IActionResult> GetUserGoals(int userId)
-////        {
-////            var goals = await _context.Goals.Where(g => g.UserId == userId).ToListAsync();
-////            return Ok(goals);
-////        }
+            // Checks if the added savings exceeds the current goal amount
+            if (goal.CurrentSavings + additionalAmount > goal.SavingsGoal)
+            {
+                // Set the error message in TempData
+                TempData["Error"] = "Cannot exceed the savings goal.";
+            }
+            else
+            {
+                // Adds the additional savings to the current savings amount
+                goal.CurrentSavings += additionalAmount;
 
-////        // POST: api/goals/add - Add a new goal
-////        [HttpPost("add")]
-////        public async Task<IActionResult> AddGoal([FromBody] Goal goal)
-////        {
-////            if (!ModelState.IsValid) return BadRequest(ModelState);
+                if (goal.CurrentSavings == goal.SavingsGoal)
+                {
+                    // Success message is displayed in TempData
+                    TempData["Success"] = $"Goal '{goal.GoalName}' has been met!";
+                }
+            }
 
-////            _context.Goals.Add(goal);
-////            await _context.SaveChangesAsync();
-////            return CreatedAtAction(nameof(GetUserGoals), new { userId = goal.UserId }, goal);
-////        }
+            // Recalculates the required monthly savings after adding additional savings
+            goal.CalculateMonthlySavings();
 
-////        // PUT: api/goals/update/{goalId} - Update a goal
-////        [HttpPut("update/{goalId}")]
-////        public async Task<IActionResult> UpdateGoal(int goalId, [FromBody] Goal updatedGoal)
-////        {
-////            var goal = await _context.Goals.FindAsync(goalId);
-////            if (goal == null) return NotFound("Goal not found.");
+            return RedirectToAction("Index");
+        }
 
-////            goal.GoalName = updatedGoal.GoalName;
-////            goal.SavingsGoal = updatedGoal.SavingsGoal;
-////            goal.CurrentSavings = updatedGoal.CurrentSavings;
-////            goal.DueDate = updatedGoal.DueDate;
-
-////            await _context.SaveChangesAsync();
-////            return Ok(goal);
-////        }
-
-////        // DELETE: api/goals/delete/{goalId} - Delete a goal
-////        [HttpDelete("delete/{goalId}")]
-////        public async Task<IActionResult> DeleteGoal(int goalId)
-////        {
-////            var goal = await _context.Goals.FindAsync(goalId);
-////            if (goal == null) return NotFound("Goal not found.");
-
-////            _context.Goals.Remove(goal);
-////            await _context.SaveChangesAsync();
-////            return Ok("Goal deleted.");
-////        }
-////    }
-////}
+        // POST for deleting a goal
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            // Calls on the GoalService to delete the goal by ID
+            _goalService.DeleteGoal(id);
+            return RedirectToAction("Index");
+        }
+    }
+}

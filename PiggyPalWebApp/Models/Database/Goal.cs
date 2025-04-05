@@ -8,7 +8,7 @@ namespace PiggyPalWebApp.Models.Database
         public int GoalId { get; set; }
 
         public int UserId { get; set; }
-        public User Owner { get; set; }
+        public User? Owner { get; set; }
 
         [Required]
         [StringLength(25, MinimumLength = 1, ErrorMessage = "Name must be between 1 to 25 characters.")] // Name of the goal contains a character limit of 25
@@ -27,5 +27,15 @@ namespace PiggyPalWebApp.Models.Database
         [Required]
         [DataType(DataType.Date, ErrorMessage = "Not a valid Date.")]
         public DateTime DueDate { get; set; } // Uses DateTime method to convert user input into a date
+
+        // Calculate the required savings per month
+        public double CalculateMonthlySavings()
+        {
+            // Calculates the months remaining in between current date and the goal due date
+            var monthsRemaining = (DueDate - DateTime.Now).Days / 30.0;
+            if (monthsRemaining <= 0) return 0;
+
+            return (SavingsGoal - CurrentSavings) / monthsRemaining;
+        }
     }
 }
