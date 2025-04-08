@@ -1,49 +1,53 @@
 ﻿using PiggyPalWebApp.Models.Database;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PiggyPalWebApp.Services
 {
-    // Service for Goals to handle goal savings logic
+    // Manages the collection of goals in memory
     public class GoalService
     {
-        // Tuple returning the savings per month required and a message to accompany it
-        // CalculateMonthlySavings method grabs data from the Goal model class
-        public (double amountRequired, string message) CalculateMonthlySavings(Goal goal)
+        // List to store the goals
+        private readonly List<Goal> _goals = new();
+
+        // Generates a unique GoalId for each goal created
+        private int _nextId = 1;
+
+        public List<Goal> GetAllGoals() => _goals;
+        
+        // Adds a new goal to the list and assigns it a unique Id
+        public void AddGoal(Goal goal)
         {
-            // Error handling for if the goal data such as due date or savings goal are missing/null
-            if (goal == null)
+            goal.GoalId = _nextId++;
+            _goals.Add(goal);
+        }
+
+        // Deletes a goal from the list by GoalId
+        public void DeleteGoal(int id)
+        {
+            var goal = _goals.FirstOrDefault(g => g.GoalId == id);
+            if (goal != null)
             {
-                return (0, "Goal data is missing.");
+                _goals.Remove(goal);
             }
+        }
 
-            // Check if the DueDate is in the past which is not allowed
-            if (goal.DueDate < DateTime.UtcNow)
+        // Retrieves a goal by its GoalId
+        public Goal? GetGoalById(int id)
+        {
+            return _goals.FirstOrDefault(g => g.GoalId == id);
+        }
+
+        // Updates an existing goal in the list
+        public void UpdateGoal(Goal updatedGoal)
+        {
+            // Finds the index of the goal to be updated by GoalId
+            var index = _goals.FindIndex(g => g.GoalId == updatedGoal.GoalId);
+           
+            if (index != -1)
             {
-                return (0, "The goal's due date has already passed. Please set a new due date.");
+                _goals[index] = updatedGoal;
             }
-
-            // Calculate the number of months left until the due date
-            var monthsRemaining = (goal.DueDate.Year - DateTime.UtcNow.Year) * 12 + goal.DueDate.Month - DateTime.UtcNow.Month;
-
-            // Ensure monthsRemaining is at least 1 to prevent errors
-            if (monthsRemaining <= 0)
-            {
-                return (0, "The goal's due date is too close or has reached the deadline");
-            }
-
-            // Calculate the total amount left to save using the savings goal minus the initial savings
-            double amountToSave = goal.SavingsGoal - goal.CurrentSavings;
-
-            // If no savings are needed, return 0
-            if (amountToSave <= 0)
-            {
-                return (0, "You have already met or exceeded your savings goal.");
-            }
-
-            // Calculate the required savings per month
-            double amountPerMonth = amountToSave / monthsRemaining;
-
-            // Returns the amount required to save per month to reach the goal, formatted to 2 decimal places
-            return (amountPerMonth, $"You need to save ${amountPerMonth:F2} per month to reach your goal.");
         }
     }
 }

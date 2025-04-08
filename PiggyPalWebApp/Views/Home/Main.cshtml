@@ -3,10 +3,10 @@
 @{
     ViewData["Title"] = "Dashboard - PiggyPal";
 }
-
+<body>
 <!--Savings goal cards-->
 <div class="goalCards d-flex gap-1 flex-column mt-3">
-    <button class="btn btn-success" id="addGoalBtn" data-bs-toggle="modal" data-bs-target="#addGoalModal">Add Saving Goal</button>
+   <!--  <button class="btn btn-success" id="addGoalBtn" data-bs-toggle="modal" data-bs-target="#addGoalModal">Add Saving Goal</button>-->
 
     <div class="card border-primary mb-3 d-none" style="width: 18rem;">
         <div class="card-header">Header</div>
@@ -79,11 +79,17 @@
 
 <!--Chart area-->
 <div class="container-fluid chatSection">
-    <div class="row">
-        <div class="col-12 col-md-3 mb-3">
-            <input type="date" class="form-control" id="inputDefault" />
+        <div class="mb-3 d-flex align-items-center gap-2">
+            <label for="chartTypeSelect" class="form-label mb-0">Chart Type:</label>
+            <select id="chartTypeToggle" class="form-select" style="width: 200px;">
+                <option value="bar">Income & Expenses Over Time</option>
+                <option value="pie">Total Expenses by Category</option>
+                <option value="budget">Budget Tracker</option>
+
+            </select>
         </div>
 
+    <div class="row">
         <div class="col-12 col-md-9" id="chart">
             <div class="charts">
                 <canvas id="Chart1"></canvas>
@@ -114,9 +120,6 @@
                     <input asp-for="CategoryDisplayName" type="text" id="incomeTitleInput" class="form-control mb-2" placeholder="Category Name" />
                 </div>
                 <div class="input-group">
-                    <input asp-for="CategorySpendingLimit" type="number" id="incomeLimitInput" class="form-control mb-2" placeholder="Spending limit" />
-                </div>
-                <div class="input-group">
                     <button class="btn btn-primary" id="saveIncomeBtn" type="submit" data-bs-dismiss="modal">Save Category</button>
                 </div>
             </form>
@@ -124,26 +127,36 @@
         </div>
     </div>
 </div>
-
 <!--Income Cateogry modal-->
+
 <!--Expense Category modal-->
 <div class="modal fade" id="addExpenseModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Expense Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close"  data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <input type="text" id="expensesTitleInput" class="form-control mb-2" placeholder="Category Name" />
-                <input type="number" id="expensesAmountInput" class="form-control mb-2" placeholder="Budget Amount" />
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="saveExpenseBtn" data-bs-dismiss="modal">Save Category</button>
-            </div>
+            <form asp-controller="Category" asp-action="CreateExpenseCategory" method="POST" class="modal-body">
+                <input asp-for="CategoryId" type="hidden" />
+
+                <input asp-for="CategoryIsExpense" value="true" type="hidden" />
+
+                <div class="input-group">
+                    <input asp-for="CategoryDisplayName" type="text" id="expenseTitleInput" class="form-control mb-2" placeholder="Category Name" />
+                </div>
+                <div class="input-group">
+                    <input asp-for="CategorySpendingLimit" type="number" id="expenseBudgetInput" class="form-control mb-2" placeholder="Budget Amount" />
+                </div>
+                <div class="input-group">
+                    <button class="btn btn-primary" id="saveExpenseBtn" type="submit" data-bs-dismiss="modal">Save Category</button>
+                </div>
+            </form>
+
         </div>
     </div>
 </div>
+
 <!--Expense Category modal-->
 
 
@@ -176,55 +189,58 @@
     <div id="myTabContent" class="tab-content">
 
 
-        <div class="tab-pane fade show active sidebar-section" id="sidebarIncome" role="tabpanel">
-            <h5 class="mt-3 ml-3">Income</h5>
-            @foreach (Category category in Model.Categories)
-            {
-                if (category.IsExpense == false)
-                {
-                    <div class="card bg-secondary mb-3 incomeCard" style="max-width: 20rem;">
-                        <div class="card-header card-title">@category.DisplayName</div>
-                        <div class="card-body">
-                            <label>Date:</label>
-                            <input type="date" class="form-control mb-2 incomeDateInput" required />
+            <div class="tab-pane fade show active sidebar-section" id="sidebarIncome" role="tabpanel">
+                <h5 class="mt-3 text-center">Income</h5>
+                <div class="d-flex flex-column align-items-center">
+                    @foreach (var category in Model.Categories.Where(c => !c.IsExpense))
+                    {
+                        <div class="card bg-secondary mb-3 incomeCard" data-category-id="@category.CategoryId" style="max-width: 20rem;">
+                            <div class="card-header card-title">@category.DisplayName</div>
+                            <div class="card-body">
+                                <label>Date:</label>
+                                <input type="date" class="form-control mb-2 incomeDateInput recordDateInput" required />
 
-                            <label>Amount:</label>
-                            <input type="number" class="form-control mb-2 incomeAmountInput" placeholder="0.00" required />
+                                <label>Amount:</label>
+                                <input type="number" class="form-control mb-2 incomeAmountInput recordAmountInput" placeholder="0.00" required />
 
-                            <div class="d-flex justify-content-center gap-2">
-                                <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
-                                <button type="button" class="btn btn-outline-danger btn-sm deleteCategory">Delete</button>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm deleteCategoryBtn" data-id="@category.CategoryId">Delete</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            }
-        </div>
+                    }
+                </div> 
+            </div> 
 
 
-        <div class="tab-pane fade sidebar-section" id="sidebarExpenses" role="tabpanel">
-            <h5 class="mt-3 ml-3">Expenses</h5>
+            <div class="tab-pane fade sidebar-section" id="sidebarExpenses" role="tabpanel">
+                <h5 class="mt-3 text-center">Expenses</h5>
+                <div class="d-flex flex-column align-items-center">
+                    @foreach (var category in Model.Categories.Where(c => c.IsExpense))
+                    {
+                        <div class="card bg-secondary mb-3 expenseCard" data-category-id="@category.CategoryId" style="max-width: 20rem;">
+                            <div class="card-header card-title">@category.DisplayName</div>
+                            <div class="card-body">
+                                <label>Budget:</label>
+                                <input type="number" class="form-control mb-2 expenseBudgetInput recordBudgetInput" placeholder="0.00"
+                                       value="@(category.SpendingLimit?.ToString("0.00") ?? "")" readonly />
 
-            <div class="card bg-secondary mb-3 expenseCard d-none" style="max-width: 20rem;">
-                <div class="card-header card-title">Expense Title</div>
-                <div class="card-body">
-                    <label>Budget:</label>
-                    <input type="number" class="form-control mb-2 expenseBudgetInput" placeholder="0.00" />
+                                <label>Date:</label>
+                                <input type="date" class="form-control mb-2 expenseDateInput recordDateInput" />
 
-                    <label>Date:</label>
-                    <input type="date" class="form-control mb-2 expenseDateInput" />
+                                <label>Amount:</label>
+                                <input type="number" class="form-control mb-2 expenseAmountInput recordAmountInput" placeholder="0.00" />
 
-                    <label>Amount:</label>
-                    <input type="number" class="form-control mb-2 expenseAmountInput" placeholder="0.00" />
-
-                    <div class="d-flex justify-content-center gap-2">
-                        <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm deleteCategory">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm deleteCategoryBtn" data-id="@category.CategoryId">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div> 
+            </div> 
 
 
 
@@ -256,10 +272,10 @@
                                     @record.Description
                                 }
                             </td>
-                            <td>
+                                <td class="@(record.RecordAmount < 0 ? "text-danger" : "")">
                                 @record.RecordAmount
                                 </td>
-                            <td><button class="badge bg-primary">Delete</button></td>
+                                <td><button class="badge bg-primary deleteRecordBtn" data-id="@record.RecordId">Delete</button></td>
                         </tr>
                     }
                 </tbody>
@@ -268,152 +284,16 @@
     </div>
 </div>
 
-
+</body>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+
 
 <script>
 
-    //endpoint for income
-    // document.addEventListener("click", function (e) {
-    //     if (e.target && e.target.matches(".incomeCard .btn-outline-success"))
-    //         const card = e.target.closest(".card");
 
-    //     const title = card.querySelector(".card-title").textContent;
-    //     const date = card.querySelector(".incomeDateInput").value;
-    //     const amount = parseFloat(card.querySelector(".incomeAmountInput").value);
-
-    //     const data = {
-    //         DateOfRecord: date,
-    //         Description: null,
-    //         RecordAmount: amount,
-    //         CategoryId: 1, Need James++++++++++++++++++++++++++++++++++++++++++++
-    //     };
-
-        // fetch("/IncomeExpense/AddRecord", {
-        //     method: "POST",
-
-        // } )
-
-    //}
-    
-
-
-
-
-
-
-
-  
-
-    //     document.getElementById("saveGoalBtn").addEventListener("click", function () {
-    //     console.log("Save button clicked");
-    //   const title = document.getElementById("goalTitleInput").value.trim();
-    //     const amount = parseFloat(document.getElementById("goalAmountInput").value);
-    //     const dateStr = document.getElementById("goalDateInput").value;
-
-    //     if (!title || isNaN(amount) || !dateStr) {
-    //         alert("Please fill in all fields.");
-    //     return;
-    //   }
-
-    //     const goalDate = new Date(dateStr);
-    //     const today = new Date();
-    //     const diffMonths = Math.max(1, (goalDate.getFullYear() - today.getFullYear()) * 12 + goalDate.getMonth() - today.getMonth());
-    //     const monthlyPayment = (amount / diffMonths).toFixed(2);
-
-    //     Find the first hidden card
-    //     const cards = document.querySelectorAll(".goalCards .card");
-    //     console.log("Cards found:", cards);
-    //     let filled = false;
-
-    //     for (const card of cards) {
-    //     if (card.classList.contains("d-none")) {
-    //         card.classList.remove("d-none");
-
-    //     card.querySelector(".card-header").textContent = title;
-    //     card.querySelector(".goalAmount").textContent = amount.toFixed(2);
-    //     card.querySelector(".goalDate").textContent = dateStr;
-    //     card.querySelector(".monthlyPayment").textContent = monthlyPayment;
-    //     card.querySelector(".remainingAmount").textContent = amount.toFixed(2);
-
-    //     Reset progress bar
-    //     const progressBar = card.querySelector(".progress-bar");
-    //     progressBar.style.width = "0%";
-    //     progressBar.textContent = "0%";
-
-    //     filled = true;
-    //     break;
-    //     }
-    //   }
-
-    //     if (!filled) {
-    //         alert("You can only have 2 goals at a time.");
-    //   }
-
-    //     Clear modal inputs
-    //     document.getElementById("goalTitleInput").value = "";
-    //     document.getElementById("goalAmountInput").value = "";
-    //     document.getElementById("goalDateInput").value = "";
-    // });
-
-
- 
-    // document.querySelectorAll(".deleteGoal").forEach(button => {
-    //             button.addEventListener("click", function () {
-    //                 const card = this.closest(".card");
-    //                 if (confirm("Delete this goal?")) {
-    //                     card.classList.add("d-none");
-
-    //                     Reset fields
-    //                     card.querySelector(".card-header").textContent = "Header";
-    //                     card.querySelector(".goalAmount").textContent = "0.00";
-    //                     card.querySelector(".goalDate").textContent = "dd-mm-yyyy";
-    //                     card.querySelector(".monthlyPayment").textContent = "0.00";
-    //                     card.querySelector(".remainingAmount").textContent = "0.00";
-
-    //                     card.querySelector(".progress-bar").style.width = "0%";
-    //                     card.querySelector(".progress-bar").textContent = "0%";
-    //                 }
-    //             });
-    // });
-
-    // Delegate submit button clicks inside goal cards
-    // document.querySelectorAll(".goalCards .card").forEach(card => {
-    //     const submitBtn = card.querySelector("button[type='submit']");
-
-    //     submitBtn.addEventListener("click", function () {
-    //         const depositInput = card.querySelector("input[type='number']");
-    //         const depositAmount = parseFloat(depositInput.value);
-    //         const goalAmount = parseFloat(card.querySelector(".goalAmount").textContent);
-    //         const remainingSpan = card.querySelector(".remainingAmount");
-    //         const progressBar = card.querySelector(".progress-bar");
-
-    //         if (isNaN(depositAmount) || depositAmount <= 0) {
-    //             alert("Please enter a valid deposit amount.");
-    //             return;
-    //         }
-
-    //         let currentRemaining = parseFloat(remainingSpan.textContent);
-    //         let newRemaining = currentRemaining - depositAmount;
-
-    //         if (newRemaining < 0) newRemaining = 0;
-
-    //         const progress = 100 - (newRemaining / goalAmount) * 100;
-
-    //         Update the remaining and progress bar
-    //         remainingSpan.textContent = newRemaining.toFixed(2);
-    //         progressBar.style.width = `${progress}%`;
-    //         progressBar.textContent = `${Math.round(progress)}%`;
-
-    //         Clear the input after submission
-    //         depositInput.value = "";
-    //     });
-    // });
-
-
- 
     // Below is for side bar
 
         // Opens Modal for Category
@@ -436,158 +316,186 @@
             }
         });
 
+    document.addEventListener("click", async (e) => {
+        if (e.target && e.target.matches(".btn-outline-success")) {
+            const card = e.target.closest(".card");
+            const date = card.querySelector(".recordDateInput")?.value;
+            const categoryId = card.getAttribute("data-category-id");
+
+            const isExpense = card.classList.contains("expenseCard");
+            let amount = parseFloat(card.querySelector(".recordAmountInput")?.value);
+
+            if (!date || isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid date and amount.");
+                return;
+            }
+
+            if (isExpense) {
+                amount = -Math.abs(amount);
+            }
+
+            const formData = new FormData();
+            formData.append("DateOfRecord", date);
+            formData.append("RecordAmount", amount);
+            formData.append("CategoryId", categoryId);
+
+            const response = await fetch("/Home/AddRecord", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                console.log("Record added successfully");
+                location.reload(); 
+            } else {
+                console.error("Failed to add record");
+            }
+        }
+    });
+
+    document.addEventListener("click", async (e) => {
+        if (e.target && e.target.classList.contains("deleteCategoryBtn")) {
+            const categoryId = e.target.getAttribute("data-id");
+
+            const confirmed = confirm("Are you sure you want to delete this category?");
+            if (!confirmed) return;
+
+            const response = await fetch("/Home/DeleteCategory", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(parseInt(categoryId))
+            });
+
+            if (response.ok) {
+                // Remove card visually
+                e.target.closest(".card").remove();
+            } else {
+                alert("Something went wrong while deleting the category.");
+            }
+        }
+    });
+
+
+    document.addEventListener("click", async (e) => {
+        if (e.target && e.target.classList.contains("deleteRecordBtn")) {
+            const recordId = e.target.getAttribute("data-id");
+
+            const confirmed = confirm("Are you sure you want to delete this record?");
+            if (!confirmed) return;
+
+            const response = await fetch("/Home/DeleteRecord", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": document.querySelector("input[name='__RequestVerificationToken']")?.value
+                },
+                body: JSON.stringify({ recordId })
+            });
+
+            if (response.ok) {
+                console.log("Record deleted");
+                location.reload(); // Reload to update history + chart
+            } else {
+                console.error("Failed to delete record");
+                alert("Something went wrong. Try again.");
+            }
+        }
+    });
 
 
 
-    //     document.getElementById("saveIncomeBtn").addEventListener("click", () => {
-    //         const title = document.getElementById("incomeTitleInput").value.trim();
-    //         const container = document.getElementById("sidebarIncome");
-    //         const template = container.querySelector(".incomeCard.d-none");
 
-    //         if (!title || !template) return;
+    
+    let currentChart = null;
+    let pieData = [];
 
-    //         const clone = template.cloneNode(true);
-    //         clone.classList.remove("d-none");
-    //         clone.querySelector(".card-title").textContent = title;
-
-    //         container.appendChild(clone);
-
-    //         Only clear what actually exists
-    //         document.getElementById("incomeTitleInput").value = "";
-    //     });
-
-
-    //         document.querySelectorAll(".incomeCard .btn-outline-success").forEach(button => {
-    //             button.addEventListener("click", function () {
-    //                 const card = this.closest(".card");
-    //                 const dateInput = card.querySelector(".incomeDateInput");
-    //                 const amountInput = card.querySelector(".incomeAmountInput");
-
-    //                 const date = dateInput.value;
-    //                 const amount = parseFloat(amountInput.value);
-
-    //                 if (!date || isNaN(amount) || amount <= 0) {
-    //                     alert("Please enter a valid date and amount.");
-    //                     return;
-    //                 }
-
-    //                 Replace inputs with display
-    //                 dateInput.replaceWith(`Date: <span>${date}</span><br>`);
-    //                 amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
-
-    //                 this.remove(); remove submit button
-    //             });
-    //         });
-
-    // document.getElementById("saveExpenseBtn").addEventListener("click", () => {
-    //     const title = document.getElementById("goalTitleInput").value.trim();
-    //     const budget = parseFloat(document.getElementById("goalAmountInput").value);
-    //     const container = document.getElementById("sidebarExpenses"); <- match this
-    //     const template = container.querySelector(".expenseCard.d-none");
-
-    //     if (!title || isNaN(budget) || !template) return;
-
-    //     const clone = template.cloneNode(true);
-    //     clone.classList.remove("d-none");
-    //     clone.querySelector(".card-title").textContent = title;
-    //     clone.querySelector(".expenseBudgetInput").value = budget.toFixed(2);
-
-    //     container.appendChild(clone);
-
-    //     document.getElementById("goalTitleInput").value = "";
-    //     document.getElementById("goalAmountInput").value = "";
-    // });
-
-
-
-
-    //         document.addEventListener("click", function (e) {
-    //             if (e.target && e.target.matches(".expensesCard .btn-outline-success")) {
-    //                 const card = e.target.closest(".expensesCard");
-    //                 const dateInput = card.querySelector(".expensesDateInput");
-    //                 const amountInput = card.querySelector(".expensesAmountInput");
-
-    //                 const date = dateInput.value;
-    //                 const amount = parseFloat(amountInput.value);
-
-    //                 if (!date || isNaN(amount) || amount <= 0) {
-    //                     alert("Please enter a valid date and amount.");
-    //                     return;
-    //                 }
-
-    //                 dateInput.replaceWith(`Date: <span>${date}</span><br>`);
-    //                 amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
-    //                 e.target.remove(); remove the submit button
-    //             }
-    //         });
-
-
-    // document.getElementById("saveExpenseBtn").addEventListener("click", () => {
-    //     const title = document.getElementById("expensesTitleInput").value.trim();
-    //     const container = document.getElementById("sidebarExpenses");
-    //     const template = container.querySelector(".expenseCard.d-none");
-
-    //     if (!title || !template) return;
-
-    //     const clone = template.cloneNode(true);
-    //     clone.classList.remove("d-none");
-    //     clone.querySelector(".card-title").textContent = title;
-
-    //     container.appendChild(clone);
-
-    //     Only clear what actually exists
-    //     document.getElementById("expensesTitleInput").value = "";
-    // });
-
-
-    // document.querySelectorAll(".expenseCard .btn-outline-success").forEach(button => {
-    //     button.addEventListener("click", function () {
-    //         const card = this.closest(".card");
-    //         const dateInput = card.querySelector(".expenseDateInput");
-    //         const amountInput = card.querySelector(".expenseAmountInput");
-
-    //         const date = dateInput.value;
-    //         const amount = parseFloat(amountInput.value);
-
-    //         if (!date || isNaN(amount) || amount <= 0) {
-    //             alert("Please enter a valid date and amount.");
-    //             return;
-    //         }
-
-    //         Replace inputs with display
-    //         dateInput.replaceWith(`Date: <span>${date}</span><br>`);
-    //         amountInput.replaceWith(`Amount: $<span>${amount.toFixed(2)}</span><br>`);
-
-    //         this.remove(); remove submit button
-    //     });
-    // });
-
-
-
-    const records = [
-        { Date: "2024-03-01", Description: "Test", RecordAmount: 50 },
-        { Date: "2024-03-02", Description: "Another", RecordAmount: 100 }
-    ];
-
-    if (records.length === 0) {
-        document.getElementById("Chart1").insertAdjacentHTML('afterend', '<p>No data to display.</p>');
-    } else {
-        const labels = records.map(r => r.Date + ' - ' + r.Description);
-        const data = records.map(r => r.RecordAmount);
-
+    // bar chart
+    function renderBarChart(data) {
         const ctx = document.getElementById('Chart1').getContext('2d');
+        const labels = data.map(r => r.date);
+        const values = data.map(r => r.amount);
 
-        new Chart(ctx, {
+        return new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'Record Amount',
-                    data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // pie chart
+    function renderPieChart(data) {
+        const ctx = document.getElementById('Chart1').getContext('2d');
+        const labels = data.map(d => d.category);
+        const values = data.map(d => d.total);
+
+        return new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#8E44AD', '#27AE60', '#F39C12'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function renderBudgetChart(data) {
+        const labels = data.map(d => d.category);
+        const budgetValues = data.map(d => d.budget);
+        const spentValues = data.map(d => Math.abs(d.spent));
+
+        const ctx = document.getElementById("Chart1").getContext("2d");
+
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Budget',
+                        data: budgetValues,
+                        backgroundColor: 'rgba(198, 134, 255, 0.6)', 
+                        borderColor: 'rgba(198, 134, 255, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Spent',
+                        data: spentValues,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)', 
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -596,11 +504,87 @@
                     y: {
                         beginAtZero: true
                     }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
                 }
             }
         });
     }
+
+
+
+    function loadChart(type, data) {
+        if (currentChart) {
+            currentChart.destroy();
+        }
+
+        const chartCanvas = document.getElementById("Chart1");
+        if (type === 'pie') {
+            chartCanvas.style.maxWidth = "400px";
+            chartCanvas.style.margin = "0 auto";
+        } else {
+            chartCanvas.style.maxWidth = "100%";
+            chartCanvas.style.margin = "initial";
+        }
+
+        if (type === 'pie') {
+            currentChart = renderPieChart(data);
+        } else if (type === 'budget') {
+            currentChart = renderBudgetChart(data); 
+        } else {
+            currentChart = renderBarChart(data);
+        }
+    }
+
+
+
+  
+    let barData = [];
     
+    fetch("/chart-data")
+        .then(res => res.json())
+        .then(data => {
+            barData = data;
+            loadChart("bar", barData); 
+        });
+
+    fetch("/chart-data/expenses-by-category")
+        .then(res => res.json())
+        .then(data => {
+            pieData = data;
+        });
+
+    fetch("/chart-data/budget-summary")
+        .then(res => res.json())
+        .then(data => {
+            console.log("Fetched Data:", data); 
+        });
 
 
+    // Toggle for charts
+    document.getElementById("chartTypeToggle").addEventListener("change", function () {
+        const selected = this.value;
+        if (selected === "bar") {
+            fetch("/chart-data")
+                .then(res => res.json())
+                .then(data => {
+                    loadChart("bar", data);
+                });
+        } else if (selected === "pie") {
+            fetch("/chart-data/expenses-by-category")
+                .then(res => res.json())
+                .then(data => {
+                    loadChart("pie", data);
+                });
+        } else if (selected === "budget") {
+            fetch("/chart-data/budget-summary")
+                .then(res => res.json())
+                .then(data => {
+                    loadChart("budget", data);
+                });
+        }
+    });
 </script>

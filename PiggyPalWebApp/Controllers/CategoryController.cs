@@ -40,5 +40,29 @@ namespace PiggyPalWebApp.Controllers
 
             return RedirectToAction("Main", "Home");
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateExpenseCategory(MainViewModel viewModel)
+        {
+            User? user = await _userManager.GetUserAsync(User);
+            if (user is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            Category newCategory = new()
+            {
+                DisplayName = viewModel.CategoryDisplayName,
+                OwnerId = user.Id,
+                SpendingLimit = viewModel.CategorySpendingLimit,
+                IsExpense = viewModel.CategoryIsExpense
+            };
+
+            await _context.Categories.AddAsync(newCategory);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Main", "Home");
+        }
     }
 }

@@ -6,14 +6,17 @@
 @inject SignInManager<User> SignInManager
 
 <h1>Welcome to PiggyPal</h1>
-<h2>A Pal for you wallet</h2>
+<h2>A Pal for your wallet</h2>
+
+<a class="btn btn-success" href="/main">Enter Dashboard</a>
+
 
 <div class="featuresList">
     <ul class="bg-danger"></ul>
     <ul>Live Chart Updates</ul>
-    <ul>Savings Goal Tracking</ul>
+    <ul><a asp-controller="Goals" asp-action="Index">Savings Goal Tracking</a></ul>
     <ul>Budget Categories</ul>
-    </div>
+</div>
 
 <div class="accordion mt-5" id="accordionFAQ">
     <div class="accordion-item">

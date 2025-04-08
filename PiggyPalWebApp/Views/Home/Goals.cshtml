@@ -1,0 +1,127 @@
+﻿@model PiggyPalWebApp.Models.ViewModels.GoalViewModel
+
+@{
+    ViewData["Title"] = "Savings Goal Tracking";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Savings Goal Tracking</h2>
+
+    <!-- Goals Form -->
+    <div class="card p-4 mb-4">
+        <h4 class="mb-3">Add a New Goal</h4>
+        <!-- The form for adding a new savings goal -->
+        <form asp-action="Add" method="post">
+            <!-- Goal Name input with validation -->
+            <div class="mb-3">
+                <label class="form-label">Goal Name:</label>
+                <input asp-for="NewGoal.GoalName" class="form-control" placeholder="Enter Goal Name" />
+                <span class="text-danger" asp-validation-for="NewGoal.GoalName"></span>
+            </div>
+            <!-- Savings Goal input with validation -->
+            <div class="mb-3">
+                <label class="form-label">Savings Goal ($):</label>
+                <input asp-for="NewGoal.SavingsGoal" type="number" step="0.01" class="form-control" placeholder="Enter Savings Goal" />
+                <span class="text-danger" asp-validation-for="NewGoal.SavingsGoal"></span>
+            </div>
+            <!-- Current Savings input with validation -->
+            <div class="mb-3">
+                <label class="form-label">Current Savings ($):</label>
+                <input asp-for="NewGoal.CurrentSavings" type="number" step="0.01" class="form-control" placeholder="Enter Current Savings" />
+                <span class="text-danger" asp-validation-for="NewGoal.CurrentSavings"></span>
+            </div>
+            <!-- Due Date selection calendar with validation -->
+            <div class="mb-3">
+                <label class="form-label">Due Date:</label>
+                <input asp-for="NewGoal.DueDate" type="date" class="form-control"/>
+                <span class="text-danger" asp-validation-for="NewGoal.DueDate"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Add Goal</button>
+        </form>
+    </div>
+
+    <!-- Goals Table -->
+    <!-- Checks for goals to display -->
+    @if (Model.Goals.Any())
+    {
+        <!-- Displays error message when applicable -->
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger text-center">
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- Displays success message when applicable -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["Success"]
+            </div>
+        }
+        
+        <!-- Table to display the saved goals -->
+        <div class="card p-4">
+            <h4 class="mb-3">Your Goals</h4>
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <!-- Table headers for the goal data -->
+                        <th>Name</th>
+                        <th>Goal Amount</th>
+                        <th>Saved</th>
+                        <th>Due</th>
+                        <th>Monthly Savings</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loops through each goal -->
+                    @foreach (var goal in Model.Goals)
+                    {
+                        <tr>
+                            <!-- Displays the goal data in string form -->
+                            <td>@goal.GoalName</td>
+                            <td>@goal.SavingsGoal.ToString("C")</td>
+                            <td>@goal.CurrentSavings.ToString("C")</td>
+                            <td>@goal.DueDate.ToShortDateString()</td>
+                            <td>
+                                <!-- Calls the method to calculate and display monthly savings -->
+                                <p>Required Monthly Savings: @goal.CalculateMonthlySavings().ToString("C")</p>
+                            </td>
+                            <td>
+                                <!-- Form/Button to delete the goal -->
+                                <form asp-action="Delete" method="post" class="mb-2">
+                                    <input type="hidden" name="id" value="@goal.GoalId" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                <!-- Form/Button to add savings to existing goals -->
+                                <form asp-action="AddSavings" method="post" class="d-flex align-items-center gap-2 mt-1">
+                                    <input type="hidden" name="id" value="@goal.GoalId" />
+                                    <!-- Disables the add savings button when the goal is reached -->
+                                    <button type="submit" class="btn btn-success btn-sm"
+                                    @(goal.CurrentSavings >= goal.SavingsGoal ? "disabled" : "")>
+                                        Add Savings
+                                    </button>
+                                    <input type="number" name="additionalAmount" step="0.01" min="0" class="form-control form-control-sm" placeholder="Add Savings" style="max-width: 160px;" />
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">
+            No goals yet. Add one above!
+        </div>
+    }
+</div>
+
+<!-- Validation Script for the goals view -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
